@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="건축·토목·조경·기계설비 도면을 바탕으로 재구성한 강서도서관 가양관의 회전 가능한 3D 내부 탐색 모델">
+<title>가양관 3D · 도서관 공간 탐색</title>
+<style>/*__STYLE__*/</style>
+</head>
+<body>
+<svg aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden"><defs>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1v15"/><path d="M5 8h4M15 8h4M5 11h4M15 11h4"/></symbol>
+<symbol id="i-cube" viewBox="0 0 24 24"><path d="m12 2 9 5v10l-9 5-9-5V7l9-5Z"/><path d="m3 7 9 5 9-5M12 12v10"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 8.5a2.5 2.5 0 0 1 5 0c0 2-2.5 2-2.5 4M12 16v.1"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M13 2H5v20h14V8l-6-6Z"/><path d="M13 2v6h6M8 12h8M8 16h8"/></symbol>
+<symbol id="i-reset" viewBox="0 0 24 24"><path d="M4 9a8 8 0 1 1 0 6M4 3v6h6"/></symbol>
+<symbol id="i-rotate" viewBox="0 0 24 24"><path d="M3 11c0-4 4-7 9-7s9 3 9 7-4 7-9 7H7m0 0 4-4m-4 4 4 4M3 7v4h4"/></symbol>
+<symbol id="i-top" viewBox="0 0 24 24"><path d="m12 4 9 5-9 5-9-5 9-5ZM3 13l9 5 9-5M3 17l9 5 9-5"/></symbol>
+<symbol id="i-front" viewBox="0 0 24 24"><path d="M4 4h16v17H4zM9 4v17M15 4v17M4 10h16M4 16h16"/></symbol>
+<symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m8 0h5v-5"/></symbol>
+<symbol id="i-camera" viewBox="0 0 24 24"><path d="M3 7h4l2-3h6l2 3h4v14H3Z"/><circle cx="12" cy="13" r="4"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+</defs></svg>
+<header>
+<button id="menu-toggle" class="icon-button" title="공간과 보기 설정" aria-label="공간과 보기 설정"><svg><use href="#i-menu"/></svg></button>
+<div class="brand"><div class="brand-icon"><svg><use href="#i-book"/></svg></div><div><h1>가양관 3D 공간 탐색</h1><p>강서도서관 · 도면 기반 건물 모델</p></div></div>
+<div class="header-actions"><button id="source-open" class="btn"><svg><use href="#i-file"/></svg>원도면</button><button id="help-open" class="btn hide-mobile"><svg><use href="#i-help"/></svg>사용 안내</button><button id="download-glb" class="btn primary"><svg><use href="#i-download"/></svg>GLB 저장</button></div>
+</header>
+<div class="shell">
+<aside id="sidebar" aria-label="층 및 공간 선택">
+<div class="sidebar-title"><div id="floor-number" class="big-floor">2F</div><div><h2 id="floor-title">자료실 · 열람실</h2><small>층을 골라 내부를 살펴보세요</small></div></div>
+<div class="floor-tabs" aria-label="층 선택"><button data-floor="-1">B1</button><button data-floor="0">1F</button><button data-floor="1" class="active">2F</button><button data-floor="2">3F</button><button data-floor="3">4F</button><button data-floor="4">RF</button></div>
+<div class="controls">
+<p class="section-label">보기 설정</p>
+<label class="switch-row"><span>외벽 · 창호</span><input id="toggle-exterior" type="checkbox" checked></label>
+<label class="switch-row"><span>가구 · 서가 <small style="font-size:10px;color:#899b9f">예시</small></span><input id="toggle-furniture" type="checkbox" checked></label>
+<label class="switch-row"><span>주요 기계설비</span><input id="toggle-mep" type="checkbox"></label>
+<label class="switch-row"><span>공간 이름</span><input id="toggle-labels" type="checkbox" checked></label>
+<div id="wall-control" class="range-control">
+<label class="switch-row" style="margin-bottom:6px"><span>벽을 낮춰 내부 보기</span><input id="toggle-cut" type="checkbox" checked></label>
+<div class="range-label"><label for="wall-height">절단 높이</label><output id="wall-value">1.45 m</output></div><input id="wall-height" type="range" min="0.40" max="4.20" value="1.45" step="0.05"><small>벽 높이를 낮추면 실내 구획이 드러납니다.</small>
+</div>
+<div id="explode-control" class="range-control" hidden><div class="range-label"><label for="explode-height">층 사이 간격</label><output id="explode-value">5.5 m</output></div><input id="explode-height" type="range" min="2" max="12" step="0.5" value="5.5"></div>
+<div id="section-control" class="range-control" hidden><div class="range-label"><label for="slice-axis">절단 방향</label><select id="slice-axis" class="select-inline"><option value="x">좌우 (X)</option><option value="z">앞뒤 (Z)</option><option value="y">높이 (Y)</option></select></div><label for="slice-value" style="font-size:12px;color:#70858b">단면 위치</label><input id="slice-value" type="range" min="0" max="100" step="1" value="60"></div>
+<details><summary>부지 · 지붕 · 표현 설정</summary><label class="switch-row"><span>부지 · 주차장</span><input id="toggle-site" type="checkbox"></label><label class="switch-row"><span>수목 · 조경</span><input id="toggle-landscape" type="checkbox" checked></label><label class="switch-row"><span>옥상 · 지붕</span><input id="toggle-roof" type="checkbox"></label><label class="switch-row"><span>주변 건물 <small style="font-size:10px">단순화</small></span><input id="toggle-context" type="checkbox"></label><label class="switch-row"><span>그림자</span><input id="toggle-shadows" type="checkbox" checked></label><label class="switch-row"><span>흰 모형으로 보기</span><input id="toggle-clay" type="checkbox"></label></details>
+</div>
+<div class="space-list-title">이 층의 공간 <span id="room-count"></span></div><div class="search-wrap"><input id="room-search" type="search" placeholder="공간 이름 검색" aria-label="공간 이름 검색"></div>
+<div id="room-list"></div>
+<div class="sidebar-foot"><b>건축 · 토목 · 조경 · 기계설비</b><br>설계변경도면을 재구성한 검토용 모델입니다.<br>준공 실측 BIM · 시공 도면이 아닙니다.</div>
+</aside>
+<main><div id="stage">
+<canvas id="viewport" aria-label="드래그로 회전 가능한 도서관 3D 모델"></canvas>
+<div id="labels"></div>
+<div class="canvas-top"><nav class="mode-tabs" aria-label="3D 보기 모드"><button data-mode="overview">건물 전체</button><button data-mode="floor" class="active">층별 내부</button><button data-mode="explode">층 분리</button><button data-mode="section">단면</button></nav><h2 id="canvas-title">2F · 층별 내부</h2><p id="canvas-subtitle">바닥의 공간을 클릭하면 실명과 위치를 확인할 수 있습니다.</p><div class="mobile-floors"><button data-floor="-1">B1</button><button data-floor="0">1F</button><button data-floor="1" class="active">2F</button><button data-floor="2">3F</button><button data-floor="3">4F</button><button data-floor="4">RF</button></div></div>
+<div class="canvas-right"><span class="unit-chip">단위 m · 로컬 실행</span><button id="save-image" class="icon-button" title="현재 3D 화면 저장" aria-label="현재 3D 화면 저장"><svg><use href="#i-camera"/></svg></button><button id="fullscreen" class="icon-button" title="전체화면" aria-label="전체화면"><svg><use href="#i-full"/></svg></button></div>
+<button id="walk-exit" class="btn" hidden>← 조감도로 돌아가기</button>
+<div id="walk-pad" hidden><button data-key="r" title="위로">↑ 높이</button><button data-key="w" title="앞으로">↑</button><button data-key="f" title="아래로">↓ 높이</button><button data-key="a" title="왼쪽">←</button><button data-key="s" title="뒤로">↓</button><button data-key="d" title="오른쪽">→</button></div>
+<section id="room-detail" class="room-detail" hidden><button id="detail-close" class="close" aria-label="공간 선택 해제">×</button><h3 id="selected-name"></h3><p id="selected-source"></p><p id="selected-area"></p><button id="walk-room" class="btn teal">이 공간에서 실내 시점 보기</button></section>
+<section class="minimap-card" aria-label="현재 층 위치 안내"><div class="minimap-head"><span id="minimap-title">2F 공간 위치</span><button id="mini-source">도면 비교</button></div><canvas id="minimap" width="220" height="132" aria-label="공간을 클릭할 수 있는 평면 안내도"></canvas></section>
+<nav class="toolbar" aria-label="3D 카메라 조작"><button id="reset-view" title="시점 초기화"><svg><use href="#i-reset"/></svg><span>초기화</span></button><button id="rotate-auto" title="자동 회전"><svg><use href="#i-rotate"/></svg><span>자동 회전</span></button><div class="separator"></div><button id="top-view" title="위에서 보기"><svg><use href="#i-top"/></svg><span>평면</span></button><button id="front-view" title="정면에서 보기"><svg><use href="#i-front"/></svg><span>정면</span></button><button id="iso-view" title="입체 시점"><svg><use href="#i-cube"/></svg><span>입체</span></button><div class="separator"></div><button id="zoom-out" class="tiny" title="축소">−</button><button id="zoom-in" class="tiny" title="확대">+</button><div class="separator"></div><button id="walk-btn" title="선택 공간 내부에서 자유롭게 이동">실내 시점</button></nav>
+<div class="bottom-note"><span>드래그 회전 · 휠 확대/축소 · 오른쪽 드래그 이동</span><span><i class="status-dot"></i><span id="render-status">3D 모델 준비 중</span></span></div>
+<div id="toast" role="status"></div><div id="loading"><div class="spinner"></div><strong>도서관 3D 모델을 여는 중입니다</strong><p>모델과 도면은 이 파일 안에 들어 있습니다.</p></div>
+</div></main>
+</div>
+<dialog id="source-dialog"><div class="dialog-head"><h2>모델과 원도면 비교</h2><button data-close="source-dialog" aria-label="원도면 닫기">×</button></div><div class="source-tools"><select id="source-select" aria-label="참고 도면 선택"></select><label for="source-zoom">도면 확대 <input id="source-zoom" type="range" min="100" max="250" value="100" step="10"></label></div><div class="source-scroll"><img id="source-img" alt="첨부 설계변경도면에서 추출한 참고 페이지"></div><p id="source-caption"></p></dialog>
+<dialog id="help-dialog"><div class="dialog-head"><h2>가양관 3D 사용 안내</h2><button data-close="help-dialog" aria-label="도움말 닫기">×</button></div><div class="help-body">
+<p>사진이 아닌 <strong>실제 삼각형 메시로 만든 3D 모델</strong>입니다. 마우스나 손가락으로 시점을 바꾸고, 원하는 층과 공간의 내부를 살펴볼 수 있습니다. 인터넷이나 계정 없이 로컬에서 동작합니다.</p>
+<h3>둘러보기</h3><table><tr><td>마우스 왼쪽 드래그</td><td>건물 회전</td></tr><tr><td>마우스 휠</td><td>확대 · 축소</td></tr><tr><td>오른쪽 드래그</td><td>화면 이동. Shift + 드래그도 가능합니다.</td></tr><tr><td>모바일</td><td>한 손가락 회전, 두 손가락 확대·축소와 이동</td></tr><tr><td>층별 내부</td><td>B1~RF 선택 → 벽 높이를 낮춰 실내 구획 보기</td></tr><tr><td>층 분리</td><td>각 층을 위로 벌려 서로 다른 평면과 열린 공간 비교</td></tr><tr><td>단면</td><td>좌우·앞뒤·높이 방향을 선택하고 슬라이더로 절단 위치 조절</td></tr><tr><td>실내 시점</td><td>공간 선택 → 실내 시점. 드래그로 둘러보고 W A S D로 이동, R/F로 높이 조절. Esc로 나가기</td></tr></table>
+<h3>모델 범위와 참고 자료</h3><p>건축 수정후 평면·입면·단면을 중심으로 지하 기계실, 지상 1~4층, 옥상, 계단과 승강기, 책누리터의 층간 열린 공간, 테라스, 외벽과 창호를 재구성했습니다. 토목 자료로 부지와 포장, 조경 자료로 식재 구역과 데크, 기계설비 자료로 주요 장비를 참고했습니다. 참고 도면은 상단 <strong>원도면</strong>에서 열 수 있습니다.</p>
+<div class="notice"><strong>정확도와 사용 범위</strong><p>스캔 도면을 사람이 읽어 좌표화한 시각화 모델이며, 현황 실측이나 모든 상세도 대조를 마친 BIM이 아닙니다. 주요 축 간격·층고와 공간 관계를 반영했지만 벽 두께·세부 개구부·난간 등은 일부 단순화했습니다. 문서 간 불일치는 임의로 확정하지 않았으며 건축 수정후 도면을 우선했습니다.</p><p><strong>가구와 서가 배치는 예시</strong>입니다. 기계설비는 주요 장비의 형태·배치를 단순화한 것으로, 전체 배관·덕트·소방설비망을 구현하지 않았습니다. 설계변경 이후 실제 운영상의 변경도 확인하지 않았습니다. 표시 면적은 모델 구획 면적이며 공적 면적이나 물량 산출에 사용할 수 없습니다.</p><p>실내 자유 시점에는 <strong>벽 충돌과 자동 계단 이동을 적용하지 않았습니다.</strong> 건물 밖으로 나가면 초기화하거나 층을 다시 선택해주세요. 단면은 시각적 절단이며 절단면 채움·두께 산정 기능은 아닙니다.</p></div>
+<h3>3D 파일 활용</h3><p><strong>GLB 저장</strong>은 모델의 실제 3D 메시를 저장합니다. 층·레이어·재질 이름이 포함되어 있으며 3D 편집기에서 수정할 수 있습니다. 창호·실내·가구·부지 등은 분리된 메시입니다. 웹 뷰어의 시점과 표시 설정은 GLB 원본에 저장되지 않습니다.</p>
+<p style="color:#74858c;font-size:12px">원본 PDF는 변경하지 않았습니다. 도면과 3D가 함께 포함된 파일이므로 외부 공개 전에 기관의 자료 공개 범위를 확인해주세요.</p>
+</div></dialog>
+<script id="model-data" type="application/json">/*__MODEL__*/</script>
+<script id="asset-data" type="application/json">/*__ASSETS__*/</script>
+<script id="glb-data" type="application/octet-stream">/*__GLB__*/</script>
+<script>/*__VIEWER__*/</script>
+</body></html>
