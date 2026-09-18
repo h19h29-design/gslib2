@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "checks": [
+    "66 room IDs retained",
+    "Original base levels retained",
+    "All model vertices/normals finite with exact counts",
+    "All non-1F original mesh positions preserved",
+    "GLB v2 header and length valid",
+    "GLB reloads all integrated mesh groups",
+    "GLB geometry bounds finite",
+    "Single-file HTML embeds identical GLB",
+    "Embedded model matches generated scene data",
+    "All 6 source stills available",
+    "No external scripts or styles required"
+  ],
+  "original_non_1F_meshes_retained": 148,
+  "stats": {
+    "triangles": 243608,
+    "meshes": 249,
+    "objectsBeforeMerge": 16189,
+    "spaces": 66
+  },
+  "sha256_html": "9c1011cb833f76654be6bd0472543ea0e8f5094619f16a24ec1e1e46009b3259",
+  "sha256_glb": "c17cf922920f254ee5d8544cf398edec6c06b940d98320a5b7803001bccaf3f5"
+}
